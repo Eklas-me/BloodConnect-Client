@@ -24,7 +24,8 @@ import {
   Users,
   DollarSign,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   id: i,
@@ -35,6 +36,22 @@ const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   delay: Math.random() * 4,
 }));
 
+// Format a number as a short readable string e.g. 1200 -> "1.2k+"
+const fmtNum = (n) => {
+  if (!n && n !== 0) return "—";
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M+`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k+`;
+  return `${n}+`;
+};
+
+// Format funding amount (USD stored) as BDT display
+const fmtFunding = (n) => {
+  if (!n && n !== 0) return "—";
+  if (n >= 1_000_000) return `৳${(n / 1_000_000).toFixed(1)}M+`;
+  if (n >= 1_000) return `৳${(n / 1_000).toFixed(1)}k+`;
+  return `৳${n}`;
+};
+
 const Home = () => {
   const { user } = useAuth();
   const [contactForm, setContactForm] = useState({
@@ -42,6 +59,17 @@ const Home = () => {
     email: "",
     message: "",
   });
+
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_API_URL}/api/public-stats`)
+      .then((res) => setStats(res.data))
+      .catch(() => setStats(null))
+      .finally(() => setStatsLoading(false));
+  }, []);
 
   const handleContactSubmit = (e) => {
     e.preventDefault();
@@ -353,7 +381,9 @@ const Home = () => {
                   <Heart className="w-3.5 h-3.5 text-red-400 fill-current" />
                   <span className="text-xs text-slate-400 font-medium">Lives Saved</span>
                 </div>
-                <p className="text-2xl font-extrabold text-white">8,000+</p>
+                <p className="text-2xl font-extrabold text-white">
+                  {statsLoading ? "…" : fmtNum(stats?.livesSaved)}
+                </p>
                 <p className="text-xs text-red-400 font-medium mt-0.5">& counting every day</p>
               </motion.div>
 
@@ -373,7 +403,9 @@ const Home = () => {
                   <TrendingUp className="w-3.5 h-3.5 text-orange-400" />
                   <span className="text-xs text-slate-400 font-medium">Funded</span>
                 </div>
-                <p className="text-2xl font-extrabold text-white">৳120k+</p>
+                <p className="text-2xl font-extrabold text-white">
+                  {statsLoading ? "…" : fmtFunding(stats?.totalFunding)}
+                </p>
                 <p className="text-xs text-orange-400 font-medium mt-0.5">Total raised</p>
               </motion.div>
             </motion.div>
@@ -399,11 +431,36 @@ const Home = () => {
             className="grid grid-cols-2 md:grid-cols-5 gap-6 text-center"
           >
             {[
-              { value: "5,000+", label: "Active Donors", icon: Users, color: "#ef4444" },
-              { value: "12,000+", label: "Requests Processed", icon: Activity, color: "#ef4444" },
-              { value: "8,000+", label: "Lives Saved", icon: Heart, color: "#ef4444" },
-              { value: "64", label: "Districts Connected", icon: MapPin, color: "#ef4444" },
-              { value: "৳120k+", label: "Funding Raised", icon: DollarSign, color: "#f97316" },
+              {
+                value: statsLoading ? "…" : fmtNum(stats?.activeDonors),
+                label: "Active Donors",
+                icon: Users,
+                color: "#ef4444",
+              },
+              {
+                value: statsLoading ? "…" : fmtNum(stats?.totalRequests),
+                label: "Requests Processed",
+                icon: Activity,
+                color: "#ef4444",
+              },
+              {
+                value: statsLoading ? "…" : fmtNum(stats?.livesSaved),
+                label: "Lives Saved",
+                icon: Heart,
+                color: "#ef4444",
+              },
+              {
+                value: "64",
+                label: "Districts Connected",
+                icon: MapPin,
+                color: "#ef4444",
+              },
+              {
+                value: statsLoading ? "…" : fmtFunding(stats?.totalFunding),
+                label: "Funding Raised",
+                icon: DollarSign,
+                color: "#f97316",
+              },
             ].map(({ value, label, icon: Icon, color }) => (
               <motion.div
                 key={label}
