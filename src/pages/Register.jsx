@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { districts, upazilas } from "@/data/bangladeshData";
@@ -14,8 +14,15 @@ import axios from "axios";
 const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
 
 const Register = () => {
-  const { register } = useAuth();
+  const { user, loading, register } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !loading) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   // Form states
   const [formData, setFormData] = useState({

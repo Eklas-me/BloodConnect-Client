@@ -1,9 +1,11 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
-  Home, User, Droplets, PlusCircle, Users, List, Droplet,
+  Home, User, Droplets, PlusCircle, Users, List, Droplet, LogOut,
 } from "lucide-react";
 
 const SidebarLink = ({ to, icon: Icon, label, end = false, onClick }) => (
@@ -26,7 +28,14 @@ const SidebarLink = ({ to, icon: Icon, label, end = false, onClick }) => (
 );
 
 const SidebarContent = ({ onLinkClick }) => {
-  const { user, isAdmin, isVolunteer } = useAuth();
+  const { user, logout, isAdmin, isVolunteer } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+    navigate("/");
+  };
 
   // Donor links
   const donorLinks = [
@@ -48,6 +57,7 @@ const SidebarContent = ({ onLinkClick }) => {
   const volunteerLinks = [
     { to: "/dashboard", icon: Home, label: "Dashboard Home", end: true },
     { to: "/dashboard/all-blood-donation-request", icon: Droplets, label: "All Donation Requests" },
+    { to: "/dashboard/create-donation-request", icon: PlusCircle, label: "Create Request" },
     { to: "/dashboard/profile", icon: User, label: "Profile" },
   ];
 
@@ -63,20 +73,7 @@ const SidebarContent = ({ onLinkClick }) => {
 
       <Separator />
 
-      {/* User info */}
-      <div className="px-4 py-4">
-        <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">
-          Logged in as
-        </p>
-        <p className="text-sm font-semibold text-gray-800 truncate">{user?.name}</p>
-        <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium capitalize">
-          {user?.role}
-        </span>
-      </div>
-
-      <Separator />
-
-      {/* Navigation */}
+      {/* Navigation (takes remaining space) */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {links.map((link) => (
           <SidebarLink key={link.to} {...link} onClick={onLinkClick} />
@@ -85,8 +82,33 @@ const SidebarContent = ({ onLinkClick }) => {
 
       <Separator />
 
+      {/* User profile info & Logout section at the bottom */}
+      <div className="p-4 space-y-3 bg-slate-50/50">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
+            {user?.name ? user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) : "U"}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-gray-800 truncate leading-tight">{user?.name}</p>
+            <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold uppercase tracking-wider mt-0.5">
+              {user?.role}
+            </span>
+          </div>
+        </div>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleLogout}
+          className="w-full justify-start text-xs border-red-200 text-red-650 hover:bg-red-50 hover:text-red-700 font-semibold gap-2 py-1.5 h-8"
+        >
+          <LogOut className="h-3.5 w-3.5" />
+          Logout
+        </Button>
+      </div>
+
       {/* Footer */}
-      <div className="px-4 py-3 text-xs text-muted-foreground">
+      <div className="px-4 pb-3 pt-1 text-[10px] text-muted-foreground border-t border-slate-100">
         © {new Date().getFullYear()} BloodConnect
       </div>
     </div>

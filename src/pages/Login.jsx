@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,19 @@ import { toast } from "sonner";
 import { Droplet, Eye, EyeOff, Loader2 } from "lucide-react";
 
 const Login = () => {
-  const { login } = useAuth();
+  const { user, loading, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   // Redirect path after successful login
   const from = location.state?.from?.pathname || "/dashboard";
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !loading) {
+      navigate(from, { replace: true });
+    }
+  }, [user, loading, navigate, from]);
 
   const [formData, setFormData] = useState({
     email: "",
