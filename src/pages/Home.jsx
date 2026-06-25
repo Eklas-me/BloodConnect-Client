@@ -44,12 +44,12 @@ const fmtNum = (n) => {
   return `${n}+`;
 };
 
-// Format funding amount (USD stored) as BDT display
+// Format funding amount (USD stored) as USD display
 const fmtFunding = (n) => {
   if (!n && n !== 0) return "—";
-  if (n >= 1_000_000) return `৳${(n / 1_000_000).toFixed(1)}M+`;
-  if (n >= 1_000) return `৳${(n / 1_000).toFixed(1)}k+`;
-  return `৳${n}`;
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M+`;
+  if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}k+`;
+  return `$${n}`;
 };
 
 const Home = () => {
