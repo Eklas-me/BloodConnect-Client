@@ -12,7 +12,6 @@ import {
   Search,
   UserPlus,
   Droplets,
-  Calendar,
   Shield,
   MessageSquare,
   Phone,
@@ -20,8 +19,21 @@ import {
   MapPin,
   Clock,
   ArrowRight,
+  Activity,
+  TrendingUp,
+  Users,
+  DollarSign,
 } from "lucide-react";
 import { useState } from "react";
+
+const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: Math.random() * 6 + 3,
+  duration: Math.random() * 8 + 6,
+  delay: Math.random() * 4,
+}));
 
 const Home = () => {
   const { user } = useAuth();
@@ -57,103 +69,372 @@ const Home = () => {
   return (
     <div className="flex-grow">
       {/* ─── Hero / Banner Section ────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-slate-900 text-white py-24 px-4 sm:px-6 lg:px-8">
-        {/* Background blobs for premium glass look */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600 rounded-full filter blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-red-700 rounded-full filter blur-3xl opacity-10 animate-pulse" />
-
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+      <section
+        className="relative overflow-hidden text-white"
+        style={{
+          background: "linear-gradient(135deg, #0a0a14 0%, #10040a 40%, #1a0510 70%, #0f0a1a 100%)",
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        {/* Animated floating particles */}
+        {PARTICLES.map((p) => (
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-6 text-center lg:text-left"
-          >
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-red-500/20 text-red-400 border border-red-500/30">
-              <Droplets className="w-4 h-4 fill-current text-red-500 animate-pulse" />
-              Saves Lives, Give Blood
-            </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-white">
-              Your Blood Can <br />
-              <span className="text-red-500">Save a Life Today</span>
-            </h1>
-            <p className="text-lg text-slate-300 max-w-xl mx-auto lg:mx-0">
-              Every drop counts. Join our community of lifesavers. Request blood during emergencies, find matching active donors nearby, or donate to support our blood bank network.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              {!user && (
-                <Button
-                  asChild
-                  className="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-6 rounded-md shadow-lg shadow-red-600/30 transition-all flex items-center gap-2 text-md"
-                >
-                  <Link to="/register">
-                    <UserPlus className="w-5 h-5" />
-                    Join as a Donor
-                  </Link>
-                </Button>
-              )}
-              <Button
-                asChild
-                variant="outline"
-                className="border-slate-700 text-slate-200 hover:bg-slate-800 hover:text-white font-semibold px-8 py-6 rounded-md transition-all flex items-center gap-2 text-md"
+            key={p.id}
+            className="absolute rounded-full bg-red-500/20"
+            style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size }}
+            animate={{ y: [0, -30, 0], opacity: [0.15, 0.5, 0.15] }}
+            transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
+          />
+        ))}
+
+        {/* Big glow orbs */}
+        <div
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            top: "10%", left: "-10%",
+            width: 600, height: 600,
+            background: "radial-gradient(circle, rgba(220,38,38,0.18) 0%, transparent 70%)",
+            filter: "blur(40px)",
+          }}
+        />
+        <div
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            bottom: "-5%", right: "-5%",
+            width: 500, height: 500,
+            background: "radial-gradient(circle, rgba(153,27,27,0.22) 0%, transparent 70%)",
+            filter: "blur(60px)",
+          }}
+        />
+        <div
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+            width: 900, height: 900,
+            background: "radial-gradient(circle, rgba(120,10,30,0.12) 0%, transparent 65%)",
+          }}
+        />
+
+        {/* Grid overlay for depth */}
+        <div
+          className="absolute inset-0 opacity-5 pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 w-full relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+            {/* Left Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.9, ease: "easeOut" }}
+              className="space-y-8 text-center lg:text-left"
+            >
+              {/* Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
               >
-                <Link to="/search">
-                  <Search className="w-5 h-5" />
-                  Search Donors
-                </Link>
-              </Button>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="relative flex justify-center"
-          >
-            <div className="relative w-full max-w-md aspect-square bg-gradient-to-tr from-red-600/20 to-slate-800/40 rounded-2xl border border-slate-800 p-8 flex flex-col justify-between shadow-2xl backdrop-blur-sm">
-              <div className="flex justify-between items-start">
-                <Heart className="w-12 h-12 text-red-500 fill-current" />
-                <span className="bg-red-500 text-white text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider">
-                  Emergency Support
+                <span
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest"
+                  style={{
+                    background: "rgba(220,38,38,0.12)",
+                    border: "1px solid rgba(220,38,38,0.35)",
+                    color: "#f87171",
+                    backdropFilter: "blur(10px)",
+                  }}
+                >
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                  Live Blood Donation Network
                 </span>
-              </div>
-              <div className="space-y-4">
-                <p className="text-2xl font-bold leading-snug">
-                  "Only 10 minutes of your time can add years to someone's life."
+              </motion.div>
+
+              {/* Headline */}
+              <div className="space-y-3">
+                <h1
+                  className="font-black leading-none tracking-tight"
+                  style={{ fontSize: "clamp(2.8rem, 6vw, 5rem)", lineHeight: 1.05 }}
+                >
+                  <span className="text-white">Every Drop</span>
+                  <br />
+                  <span
+                    style={{
+                      background: "linear-gradient(135deg, #ef4444 0%, #dc2626 40%, #f97316 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    Saves a Life.
+                  </span>
+                </h1>
+                <p className="text-slate-400 text-lg max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                  Bangladesh's most trusted blood donation platform. Connect with verified donors, post emergency requests, and be someone's hero — in minutes.
                 </p>
-                <div className="border-t border-slate-800 pt-4 flex items-center justify-between">
-                  <div className="flex gap-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full animate-ping" />
-                    <span className="text-xs text-slate-400">Available Donors Online</span>
-                  </div>
-                  <span className="text-sm font-bold text-red-500">2,482 active</span>
-                </div>
               </div>
-            </div>
-          </motion.div>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                {!user && (
+                  <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+                    <Button
+                      asChild
+                      className="text-white font-bold px-8 py-6 rounded-xl shadow-2xl text-base w-full sm:w-auto"
+                      style={{
+                        background: "linear-gradient(135deg, #dc2626, #b91c1c)",
+                        boxShadow: "0 0 30px rgba(220,38,38,0.45), 0 4px 20px rgba(0,0,0,0.4)",
+                        border: "1px solid rgba(239,68,68,0.4)",
+                      }}
+                    >
+                      <Link to="/register" className="flex items-center gap-2">
+                        <UserPlus className="w-5 h-5" />
+                        Join as a Donor
+                      </Link>
+                    </Button>
+                  </motion.div>
+                )}
+                <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+                  <Button
+                    asChild
+                    className="font-bold px-8 py-6 rounded-xl text-base w-full sm:w-auto"
+                    style={{
+                      background: "rgba(255,255,255,0.06)",
+                      border: "1px solid rgba(255,255,255,0.15)",
+                      color: "#e2e8f0",
+                      backdropFilter: "blur(12px)",
+                    }}
+                  >
+                    <Link to="/search" className="flex items-center gap-2">
+                      <Search className="w-5 h-5" />
+                      Find Donors
+                    </Link>
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+                  <Button
+                    asChild
+                    className="font-bold px-8 py-6 rounded-xl text-base w-full sm:w-auto"
+                    style={{
+                      background: "rgba(255,255,255,0.06)",
+                      border: "1px solid rgba(255,255,255,0.15)",
+                      color: "#e2e8f0",
+                      backdropFilter: "blur(12px)",
+                    }}
+                  >
+                    <Link to="/donation-requests" className="flex items-center gap-2">
+                      <Droplets className="w-5 h-5" />
+                      View Requests
+                    </Link>
+                  </Button>
+                </motion.div>
+              </div>
+
+              {/* Mini trust chips */}
+              <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                {[
+                  { icon: Users, text: "5,000+ Active Donors" },
+                  { icon: Activity, text: "24/7 Support" },
+                  { icon: Shield, text: "Verified & Secure" },
+                ].map(({ icon: Icon, text }) => (
+                  <div
+                    key={text}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400"
+                    style={{
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                    }}
+                  >
+                    <Icon className="w-3.5 h-3.5 text-red-400" />
+                    {text}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Right Visual — Blood Drop + Glassmorphism Cards */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+              className="relative flex justify-center items-center"
+            >
+              {/* Central glow */}
+              <div
+                className="absolute rounded-full pointer-events-none"
+                style={{
+                  width: 320, height: 320,
+                  background: "radial-gradient(circle, rgba(220,38,38,0.3) 0%, transparent 70%)",
+                  filter: "blur(30px)",
+                }}
+              />
+
+              {/* Blood drop SVG */}
+              <motion.div
+                animate={{ y: [0, -16, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="relative z-10"
+              >
+                <svg
+                  viewBox="0 0 200 240"
+                  width="220"
+                  height="264"
+                  className="drop-shadow-2xl"
+                  style={{ filter: "drop-shadow(0 0 40px rgba(220,38,38,0.6))" }}
+                >
+                  <defs>
+                    <radialGradient id="dropGrad" cx="40%" cy="30%" r="70%">
+                      <stop offset="0%" stopColor="#f87171" />
+                      <stop offset="50%" stopColor="#dc2626" />
+                      <stop offset="100%" stopColor="#7f1d1d" />
+                    </radialGradient>
+                    <radialGradient id="shineGrad" cx="35%" cy="25%" r="40%">
+                      <stop offset="0%" stopColor="rgba(255,255,255,0.4)" />
+                      <stop offset="100%" stopColor="transparent" />
+                    </radialGradient>
+                  </defs>
+                  {/* Drop shape */}
+                  <path
+                    d="M100 10 C100 10, 180 110, 180 155 C180 200, 143 230, 100 230 C57 230, 20 200, 20 155 C20 110, 100 10, 100 10Z"
+                    fill="url(#dropGrad)"
+                  />
+                  {/* Shine overlay */}
+                  <path
+                    d="M100 10 C100 10, 180 110, 180 155 C180 200, 143 230, 100 230 C57 230, 20 200, 20 155 C20 110, 100 10, 100 10Z"
+                    fill="url(#shineGrad)"
+                    opacity="0.5"
+                  />
+                  {/* Cross / heart symbol inside drop */}
+                  <text x="75" y="175" fontSize="55" fill="rgba(255,255,255,0.85)">🩸</text>
+                </svg>
+              </motion.div>
+
+              {/* Floating glass cards around the drop */}
+              <motion.div
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6, duration: 0.7 }}
+                className="absolute top-0 right-0 rounded-2xl p-4 shadow-2xl"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  backdropFilter: "blur(16px)",
+                  minWidth: 160,
+                }}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-xs text-slate-400 font-medium">Live Donors</span>
+                </div>
+                <p className="text-2xl font-extrabold text-white">2,482</p>
+                <p className="text-xs text-green-400 font-medium mt-0.5">↑ Online now</p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8, duration: 0.7 }}
+                className="absolute bottom-8 left-0 rounded-2xl p-4 shadow-2xl"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  backdropFilter: "blur(16px)",
+                  minWidth: 170,
+                }}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <Heart className="w-3.5 h-3.5 text-red-400 fill-current" />
+                  <span className="text-xs text-slate-400 font-medium">Lives Saved</span>
+                </div>
+                <p className="text-2xl font-extrabold text-white">8,000+</p>
+                <p className="text-xs text-red-400 font-medium mt-0.5">& counting every day</p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.0, duration: 0.7 }}
+                className="absolute bottom-0 right-4 rounded-2xl p-4 shadow-2xl"
+                style={{
+                  background: "rgba(220,38,38,0.15)",
+                  border: "1px solid rgba(220,38,38,0.3)",
+                  backdropFilter: "blur(16px)",
+                  minWidth: 150,
+                }}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <TrendingUp className="w-3.5 h-3.5 text-orange-400" />
+                  <span className="text-xs text-slate-400 font-medium">Funded</span>
+                </div>
+                <p className="text-2xl font-extrabold text-white">৳120k+</p>
+                <p className="text-xs text-orange-400 font-medium mt-0.5">Total raised</p>
+              </motion.div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Bottom wave separator */}
+        <div className="absolute bottom-0 left-0 right-0 overflow-hidden" style={{ height: 60 }}>
+          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style={{ width: "100%", height: "100%" }}>
+            <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#0f172a" />
+          </svg>
         </div>
       </section>
 
       {/* ─── Stats Section ──────────────────────────────────────────────── */}
-      <section className="bg-slate-900 border-t border-slate-800 py-10 px-4 text-white">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div className="space-y-1">
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-red-500">5k+</h3>
-            <p className="text-sm text-slate-400">Active Donors</p>
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-red-500">12k+</h3>
-            <p className="text-sm text-slate-400">Requests Processed</p>
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-red-500">8k+</h3>
-            <p className="text-sm text-slate-400">Success Stories</p>
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-red-500">64</h3>
-            <p className="text-sm text-slate-400">Districts Connected</p>
-          </div>
+      <section className="bg-slate-900 border-t border-slate-800/50 py-12 px-4 text-white">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid grid-cols-2 md:grid-cols-5 gap-6 text-center"
+          >
+            {[
+              { value: "5,000+", label: "Active Donors", icon: Users, color: "#ef4444" },
+              { value: "12,000+", label: "Requests Processed", icon: Activity, color: "#ef4444" },
+              { value: "8,000+", label: "Lives Saved", icon: Heart, color: "#ef4444" },
+              { value: "64", label: "Districts Connected", icon: MapPin, color: "#ef4444" },
+              { value: "৳120k+", label: "Funding Raised", icon: DollarSign, color: "#f97316" },
+            ].map(({ value, label, icon: Icon, color }) => (
+              <motion.div
+                key={label}
+                variants={itemVariants}
+                className="group rounded-2xl p-5 cursor-default"
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  transition: "all 0.3s ease",
+                }}
+                whileHover={{
+                  scale: 1.04,
+                  background: "rgba(220,38,38,0.08)",
+                  borderColor: "rgba(220,38,38,0.3)",
+                }}
+              >
+                <div className="flex justify-center mb-3">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: "rgba(220,38,38,0.15)" }}
+                  >
+                    <Icon className="w-5 h-5" style={{ color }} />
+                  </div>
+                </div>
+                <h3 className="text-3xl sm:text-4xl font-extrabold" style={{ color }}>
+                  {value}
+                </h3>
+                <p className="text-sm text-slate-400 mt-1">{label}</p>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
