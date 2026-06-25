@@ -365,11 +365,12 @@ const Profile = () => {
               <div className="w-full border-t border-slate-100" />
 
               {/* Blood Group Display with Glow */}
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Registered Blood Group</span>
-                <div className="relative w-20 h-20 mx-auto rounded-2xl bg-gradient-to-tr from-rose-50 to-red-50/50 border border-red-100 flex flex-col items-center justify-center shadow-inner hover:scale-105 transition-transform duration-300">
-                  <Droplet className="absolute w-12 h-12 text-red-500/10 -bottom-1" />
-                  <span className="text-2xl font-black text-red-600 z-10 leading-none">{user?.bloodGroup}</span>
+                <div className="relative w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br from-rose-50 to-red-50/30 border border-red-100/70 flex flex-col items-center justify-center shadow-sm overflow-hidden group hover:scale-105 transition-all duration-300">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(239,68,68,0.08),transparent_50%)]" />
+                  <Droplet className="w-7 h-7 text-red-500 fill-red-500/10 animate-pulse mb-1 z-10" />
+                  <span className="text-xl font-bold text-red-600 z-10 leading-none">{user?.bloodGroup}</span>
                 </div>
               </div>
 
