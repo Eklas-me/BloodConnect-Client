@@ -49,7 +49,6 @@ const DonationRequestDetails = () => {
 
       toast.success("Thank you! Donation accepted successfully.");
       setConfirmOpen(false);
-      // Reload details
       const res = await axiosSecure.get(`/api/donation-requests/${id}`);
       setRequest(res.data);
     } catch (err) {

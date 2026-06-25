@@ -27,17 +27,13 @@ const Navbar = () => {
 
   const isHome = location.pathname === "/";
 
-  // Track scroll position
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", onScroll, { passive: true });
-    // Set initial state in case page is loaded mid-scroll
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Determine visual mode:
-  // transparent = home page AND not yet scrolled
   const isTransparent = isHome && !scrolled;
 
   const handleLogout = () => {

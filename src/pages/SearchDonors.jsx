@@ -20,7 +20,7 @@ const SearchDonors = () => {
   });
 
   const [filteredUpazilas, setFilteredUpazilas] = useState([]);
-  const [donors, setDonors] = useState(null); // null means not searched yet
+  const [donors, setDonors] = useState(null);
   const [searching, setSearching] = useState(false);
 
   const handleSelectChange = (name, value) => {
@@ -66,7 +66,6 @@ const SearchDonors = () => {
     }
   };
 
-  // Helper to trigger printable PDF download of the search results
   const handleDownloadPDF = () => {
     if (!donors || donors.length === 0) return;
 

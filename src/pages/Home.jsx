@@ -36,7 +36,6 @@ const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   delay: Math.random() * 4,
 }));
 
-// Format a number as a short readable string e.g. 1200 -> "1.2k+"
 const fmtNum = (n) => {
   if (!n && n !== 0) return "—";
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M+`;
@@ -44,7 +43,6 @@ const fmtNum = (n) => {
   return `${n}+`;
 };
 
-// Format funding amount (USD stored) as USD display
 const fmtFunding = (n) => {
   if (!n && n !== 0) return "—";
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M+`;

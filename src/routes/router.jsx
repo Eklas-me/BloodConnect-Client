@@ -5,7 +5,6 @@ import PrivateRoute from "./PrivateRoute";
 import AdminRoute from "./AdminRoute";
 import AdminVolunteerRoute from "./AdminVolunteerRoute";
 
-// Pages
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
@@ -14,7 +13,6 @@ import DonationRequestDetails from "@/pages/DonationRequestDetails";
 import SearchDonors from "@/pages/SearchDonors";
 import Funding from "@/pages/Funding";
 
-// Dashboard Pages
 import DashboardHome from "@/pages/dashboard/DashboardHome";
 import Profile from "@/pages/dashboard/Profile";
 import MyDonationRequests from "@/pages/dashboard/MyDonationRequests";

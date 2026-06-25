@@ -26,18 +26,15 @@ import {
 const MyDonationRequests = () => {
   const axiosSecure = useAxiosSecure();
 
-  // Listing state
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // Pagination state
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const limit = 5;
 
-  // Deletion modal state
   const [deleteId, setDeleteId] = useState(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -69,13 +66,11 @@ const MyDonationRequests = () => {
     fetchMyRequests();
   }, [page, statusFilter, axiosSecure]);
 
-  // Reset page when filter changes
   const handleFilterChange = (value) => {
     setStatusFilter(value);
     setPage(1);
   };
 
-  // Handle donation status done/canceled update
   const handleStatusUpdate = async (reqId, newStatus) => {
     try {
       await axiosSecure.patch(`/api/donation-requests/${reqId}/status`, {
@@ -89,7 +84,6 @@ const MyDonationRequests = () => {
     }
   };
 
-  // Handle request deletion
   const handleDeleteConfirm = async () => {
     if (!deleteId) return;
     setDeleting(true);
@@ -97,7 +91,6 @@ const MyDonationRequests = () => {
       await axiosSecure.delete(`/api/donation-requests/${deleteId}`);
       toast.success("Request deleted successfully");
       setDeleteOpen(false);
-      // Adjust page if we deleted the last item on the page
       if (requests.length === 1 && page > 1) {
         setPage((prev) => prev - 1);
       } else {

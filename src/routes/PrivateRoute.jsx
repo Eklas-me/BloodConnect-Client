@@ -1,7 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Shows spinner while auth is loading, then redirects if not logged in
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
 

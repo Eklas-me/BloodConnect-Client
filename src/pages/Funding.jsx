@@ -12,12 +12,10 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Heart, DollarSign, Calendar, User, Key, Loader2, AlertCircle } from "lucide-react";
 
-// Initialize Stripe outside of component render
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_placeholder");
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-// ─── Stripe Checkout Form Component ──────────────────────────────────────────
 const CheckoutForm = ({ amount, onSuccess, onClose }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -38,11 +36,9 @@ const CheckoutForm = ({ amount, onSuccess, onClose }) => {
     setError(null);
 
     try {
-      // 1. Create Payment Intent on the server
       const { data } = await axiosSecure.post("/api/create-payment-intent", { amount });
       const clientSecret = data.clientSecret;
 
-      // 2. Confirm card payment
       const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
         clientSecret,
         {
@@ -61,7 +57,6 @@ const CheckoutForm = ({ amount, onSuccess, onClose }) => {
         setError(confirmError.message);
         toast.error(confirmError.message);
       } else if (paymentIntent.status === "succeeded") {
-        // 3. Save funding record in database
         await axiosSecure.post("/api/funds", {
           userName: user.name,
           userEmail: user.email,
@@ -148,7 +143,6 @@ const CheckoutForm = ({ amount, onSuccess, onClose }) => {
   );
 };
 
-// ─── Main Funding Page Component ─────────────────────────────────────────────
 const Funding = () => {
   const axiosSecure = useAxiosSecure();
   const [funds, setFunds] = useState([]);

@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Sync session state and JWT token fallback
   useEffect(() => {
     const syncAuth = async () => {
       const token = localStorage.getItem("access-token");
@@ -52,7 +51,6 @@ export const AuthProvider = ({ children }) => {
     syncAuth();
   }, [session, sessionLoading]);
 
-  // Sync access token if Better Auth session works
   useEffect(() => {
     if (session?.user) {
       const fetchToken = async () => {
@@ -78,7 +76,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, [session, sessionLoading]);
 
-  // Register helper
   const register = async ({ email, password, name, avatar, bloodGroup, district, upazila }) => {
     const { data, error } = await authClient.signUp.email({
       email,
@@ -140,7 +137,6 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  // Login helper
   const login = async (email, password) => {
     const { data, error } = await authClient.signIn.email({
       email,
@@ -207,14 +203,12 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  // Logout helper
   const logout = async () => {
     await authClient.signOut();
     localStorage.removeItem("access-token");
     setUser(null);
   };
 
-  // Sync state after update
   const updateUser = async () => {
     await refetch();
     const token = localStorage.getItem("access-token");

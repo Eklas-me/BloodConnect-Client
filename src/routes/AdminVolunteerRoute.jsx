@@ -1,7 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Allows admin OR volunteer
 const AdminVolunteerRoute = ({ children }) => {
   const { user, loading, isAdmin, isVolunteer } = useAuth();
 

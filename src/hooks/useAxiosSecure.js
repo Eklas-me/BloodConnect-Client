@@ -13,7 +13,6 @@ const useAxiosSecure = () => {
       withCredentials: true,
     });
 
-    // Request interceptor to attach JWT token to Authorization header
     instance.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem("access-token");
@@ -25,7 +24,6 @@ const useAxiosSecure = () => {
       (error) => Promise.reject(error)
     );
 
-    // Handle 401/403 — auto logout
     instance.interceptors.response.use(
       (response) => response,
       (error) => {

@@ -32,19 +32,16 @@ const DashboardHome = () => {
   const { user, isAdmin, isVolunteer } = useAuth();
   const axiosSecure = useAxiosSecure();
 
-  // Donor states
   const [recentRequests, setRecentRequests] = useState([]);
   const [donorLoading, setDonorLoading] = useState(!isAdmin && !isVolunteer);
   const [deleteId, setDeleteId] = useState(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Admin/Volunteer states
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(isAdmin || isVolunteer);
   const [chartData, setChartData] = useState([]);
 
-  // Fetch data on mount
   useEffect(() => {
     if (isAdmin || isVolunteer) {
       const fetchAdminStats = async () => {
@@ -52,9 +49,6 @@ const DashboardHome = () => {
           const res = await axiosSecure.get("/api/stats");
           setStats(res.data);
 
-          // Get chart data by grouping requests status (simulated grouping based on overall numbers or simple query)
-          // Since the stats API gives total numbers, let's fetch requests to construct an exact chart,
-          // or construct a neat status chart. Let's make an API call to get status details.
           const reqRes = await axiosSecure.get("/api/all-donation-requests", {
             params: { limit: 100 },
           });
@@ -97,14 +91,12 @@ const DashboardHome = () => {
     }
   }, [isAdmin, isVolunteer, axiosSecure]);
 
-  // Handle status update (done / canceled)
   const handleStatusUpdate = async (reqId, newStatus) => {
     try {
       await axiosSecure.patch(`/api/donation-requests/${reqId}/status`, {
         status: newStatus,
       });
       toast.success(`Donation marked as ${newStatus}`);
-      // Refresh local requests
       const res = await axiosSecure.get("/api/my-donation-requests/recent");
       setRecentRequests(res.data);
     } catch (err) {
@@ -113,7 +105,6 @@ const DashboardHome = () => {
     }
   };
 
-  // Handle donation request delete
   const handleDeleteConfirm = async () => {
     if (!deleteId) return;
     setDeleting(true);
@@ -121,7 +112,6 @@ const DashboardHome = () => {
       await axiosSecure.delete(`/api/donation-requests/${deleteId}`);
       toast.success("Request deleted successfully");
       setDeleteOpen(false);
-      // Refresh
       const res = await axiosSecure.get("/api/my-donation-requests/recent");
       setRecentRequests(res.data);
     } catch (err) {
@@ -133,7 +123,7 @@ const DashboardHome = () => {
     }
   };
 
-  // Render Admin / Volunteer View
+
   if (isAdmin || isVolunteer) {
     return (
       <div className="space-y-8">
@@ -230,7 +220,6 @@ const DashboardHome = () => {
     );
   }
 
-  // Render Donor View
   return (
     <div className="space-y-8">
       {/* Welcome & Create Button Header */}

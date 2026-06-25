@@ -34,14 +34,12 @@ const EditDonationRequest = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch current request details
   useEffect(() => {
     const fetchRequestDetails = async () => {
       try {
         const res = await axiosSecure.get(`/api/donation-requests/${id}`);
         const requestData = res.data;
 
-        // Populate form data
         setFormData({
           recipientName: requestData.recipientName || "",
           recipientDistrict: requestData.recipientDistrict || "",
@@ -54,7 +52,6 @@ const EditDonationRequest = () => {
           requestMessage: requestData.requestMessage || "",
         });
 
-        // Filter upazilas based on fetched district
         if (requestData.recipientDistrict) {
           const selectedDistrict = districts.find((d) => d.name === requestData.recipientDistrict);
           if (selectedDistrict) {

@@ -37,7 +37,6 @@ const SidebarContent = ({ onLinkClick }) => {
     navigate("/");
   };
 
-  // Donor links
   const donorLinks = [
     { to: "/dashboard", icon: Home, label: "Dashboard Home", end: true },
     { to: "/dashboard/my-donation-requests", icon: List, label: "My Donation Requests" },
@@ -45,7 +44,6 @@ const SidebarContent = ({ onLinkClick }) => {
     { to: "/dashboard/profile", icon: User, label: "Profile" },
   ];
 
-  // Admin links
   const adminLinks = [
     { to: "/dashboard", icon: Home, label: "Dashboard Home", end: true },
     { to: "/dashboard/all-users", icon: Users, label: "All Users" },
@@ -53,7 +51,6 @@ const SidebarContent = ({ onLinkClick }) => {
     { to: "/dashboard/profile", icon: User, label: "Profile" },
   ];
 
-  // Volunteer links
   const volunteerLinks = [
     { to: "/dashboard", icon: Home, label: "Dashboard Home", end: true },
     { to: "/dashboard/all-blood-donation-request", icon: Droplets, label: "All Donation Requests" },

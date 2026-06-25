@@ -17,14 +17,12 @@ const Register = () => {
   const { user, loading, register } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in
   useEffect(() => {
     if (user && !loading) {
       navigate("/dashboard", { replace: true });
     }
   }, [user, loading, navigate]);
 
-  // Form states
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -41,16 +39,13 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Dynamic upazila list based on selected district
   const [filteredUpazilas, setFilteredUpazilas] = useState([]);
 
-  // Handle text inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle select values
   const handleSelectChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
@@ -67,7 +62,6 @@ const Register = () => {
     }
   };
 
-  // Handle avatar file selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -80,13 +74,11 @@ const Register = () => {
     }
   };
 
-  // Submit registration form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const { name, email, bloodGroup, district, upazila, password, confirmPassword } = formData;
 
-    // Client-side validations
     if (!name || !email || !bloodGroup || !district || !upazila || !password || !confirmPassword) {
       toast.error("Please fill in all fields");
       return;
