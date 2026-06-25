@@ -70,7 +70,6 @@ const SearchDonors = () => {
   const handleDownloadPDF = () => {
     if (!donors || donors.length === 0) return;
 
-    // Create a hidden iframe for print operation
     const iframe = document.createElement("iframe");
     iframe.style.position = "absolute";
     iframe.style.width = "0px";

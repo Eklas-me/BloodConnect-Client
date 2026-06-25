@@ -55,7 +55,6 @@ const Register = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (name === "district") {
-      // Find district ID from the name
       const selectedDistrict = districts.find((d) => d.name === value);
       if (selectedDistrict) {
         const matchingUpazilas = upazilas.filter((u) => u.district_id === selectedDistrict.id);
@@ -63,7 +62,7 @@ const Register = () => {
       } else {
         setFilteredUpazilas([]);
       }
-      // Reset upazila select
+
       setFormData((prev) => ({ ...prev, upazila: "" }));
     }
   };
@@ -111,7 +110,7 @@ const Register = () => {
     setIsSubmitting(true);
 
     try {
-      // 1. Upload image to ImageBB
+
       const imgFormData = new FormData();
       imgFormData.append("image", avatarFile);
 
@@ -127,7 +126,6 @@ const Register = () => {
         throw new Error("Failed to upload avatar image. Please check API key.");
       }
 
-      // 2. Call register API from AuthContext
       await register({
         name,
         email,
