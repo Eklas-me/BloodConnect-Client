@@ -226,7 +226,7 @@ const AllBloodDonationRequests = () => {
 
                         {/* Donor Info */}
                         <TableCell>
-                          {req.status === "inprogress" && req.donorName ? (
+                          {req.donorName ? (
                             <div className="text-xs space-y-0.5 text-slate-500">
                               <p className="font-bold text-slate-700">{req.donorName}</p>
                               <p className="truncate max-w-[100px] text-slate-400">{req.donorEmail}</p>
