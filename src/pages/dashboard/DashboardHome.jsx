@@ -197,7 +197,7 @@ const DashboardHome = () => {
               </Card>
             </div>
 
-            {/* Charts section (Optional Task Completed!) */}
+            {/* Charts */}
             <Card className="shadow-sm border border-slate-150 bg-white">
               <CardHeader>
                 <CardTitle className="text-lg font-bold text-slate-850">Donation Requests Statistics</CardTitle>

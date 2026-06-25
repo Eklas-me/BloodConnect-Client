@@ -10,17 +10,15 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ─── Sync session state and JWT token fallback (cross-domain cookie safe) ───
+  // Sync session state and JWT token fallback
   useEffect(() => {
     const syncAuth = async () => {
       const token = localStorage.getItem("access-token");
 
       if (session?.user) {
-        // Standard session cookie auth
         setUser(session.user);
         setLoading(false);
       } else if (token) {
-        // Cross-domain cookie is blocked, but we have a valid JWT!
         try {
           const res = await fetch(`${API_URL}/api/profile`, {
             headers: {
@@ -34,7 +32,6 @@ export const AuthProvider = ({ children }) => {
               ...profile
             });
           } else {
-            // Token expired or invalid
             localStorage.removeItem("access-token");
             setUser(null);
           }
@@ -45,7 +42,6 @@ export const AuthProvider = ({ children }) => {
           setLoading(false);
         }
       } else {
-        // No session and no token
         if (!sessionLoading) {
           setUser(null);
           setLoading(false);
@@ -56,7 +52,7 @@ export const AuthProvider = ({ children }) => {
     syncAuth();
   }, [session, sessionLoading]);
 
-  // Keep access token synced if Better Auth session cookie works
+  // Sync access token if Better Auth session works
   useEffect(() => {
     if (session?.user) {
       const fetchToken = async () => {
@@ -82,15 +78,12 @@ export const AuthProvider = ({ children }) => {
     }
   }, [session, sessionLoading]);
 
-
-  // ─── Register ──────────────────────────────────────────────────────────────
-  // Better Auth signUp.email() handles hashing & session creation
+  // Register helper
   const register = async ({ email, password, name, avatar, bloodGroup, district, upazila }) => {
     const { data, error } = await authClient.signUp.email({
       email,
       password,
       name,
-      // Pass custom fields
       bloodGroup,
       district,
       upazila,
@@ -103,7 +96,6 @@ export const AuthProvider = ({ children }) => {
 
     setLoading(true);
 
-    // Fetch the JWT token immediately on successful registration to prevent race conditions
     let token = "";
     try {
       const res = await fetch(`${API_URL}/api/jwt`, {
@@ -122,7 +114,6 @@ export const AuthProvider = ({ children }) => {
       console.error("JWT fetch failed on registration:", err);
     }
 
-    // Fetch and populate user profile details immediately using JWT
     if (token) {
       try {
         const res = await fetch(`${API_URL}/api/profile`, {
@@ -149,7 +140,7 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  // ─── Login ─────────────────────────────────────────────────────────────────
+  // Login helper
   const login = async (email, password) => {
     const { data, error } = await authClient.signIn.email({
       email,
@@ -157,7 +148,6 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (error) {
-      // Map Better Auth error messages to user-friendly ones
       if (error.message?.toLowerCase().includes("invalid") || error.status === 401) {
         throw new Error("Invalid email or password");
       }
@@ -166,7 +156,6 @@ export const AuthProvider = ({ children }) => {
 
     setLoading(true);
 
-    // Fetch the JWT token immediately on successful login to prevent race conditions
     let token = "";
     try {
       const res = await fetch(`${API_URL}/api/jwt`, {
@@ -185,7 +174,6 @@ export const AuthProvider = ({ children }) => {
       console.error("JWT fetch failed on login:", err);
     }
 
-    // Fetch and populate user profile immediately using JWT
     if (token) {
       try {
         const res = await fetch(`${API_URL}/api/profile`, {
@@ -196,7 +184,6 @@ export const AuthProvider = ({ children }) => {
         if (res.ok) {
           const profile = await res.json();
           if (profile.status === "blocked") {
-            // Sign out immediately if blocked
             await authClient.signOut();
             localStorage.removeItem("access-token");
             setUser(null);
@@ -220,14 +207,14 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  // ─── Logout ────────────────────────────────────────────────────────────────
+  // Logout helper
   const logout = async () => {
     await authClient.signOut();
     localStorage.removeItem("access-token");
     setUser(null);
   };
 
-  // ─── Update local user state (after profile update) ────────────────────────
+  // Sync state after update
   const updateUser = async () => {
     await refetch();
     const token = localStorage.getItem("access-token");

@@ -34,8 +34,8 @@ const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
 const BANNER_PARTICLES = Array.from({ length: 15 }, (_, i) => ({
   id: i,
   x: Math.random() * 100,
-  size: Math.random() * 8 + 5, // 5px to 13px
-  duration: Math.random() * 8 + 6, // 6s to 14s
+  size: Math.random() * 8 + 5,
+  duration: Math.random() * 8 + 6,
   delay: Math.random() * 4,
 }));
 
@@ -46,7 +46,6 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Form states initialized with current user details
   const [formData, setFormData] = useState({
     name: user?.name || "",
     avatar: user?.avatar || "",
@@ -119,7 +118,6 @@ const Profile = () => {
     try {
       let finalAvatarUrl = formData.avatar;
 
-      // 1. If user chose a new profile image, upload to ImageBB
       if (avatarFile) {
         const imgFormData = new FormData();
         imgFormData.append("image", avatarFile);
@@ -131,15 +129,12 @@ const Profile = () => {
         finalAvatarUrl = imgbbRes.data.data.url;
       }
 
-      // 2. Submit patch profile request
       const updatedProfile = {
         ...formData,
         avatar: finalAvatarUrl,
       };
 
       await axiosSecure.patch("/api/profile", updatedProfile);
-
-      // 3. Update application context state
       updateUser(updatedProfile);
 
       toast.success("Profile updated successfully!");
@@ -162,7 +157,6 @@ const Profile = () => {
       .toUpperCase()
       .slice(0, 2) || "U";
 
-  // Role style selection
   const getRoleBadge = (role) => {
     switch (role?.toLowerCase()) {
       case "admin":
@@ -190,8 +184,6 @@ const Profile = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-300">
-      
-      {/* ─── Profile Header Banner ────────────────────────────────────────── */}
       <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-slate-950 via-slate-900 to-red-950 h-44 shadow-lg border border-slate-800">
         
         {/* Glow orbs */}
@@ -211,7 +203,6 @@ const Profile = () => {
           }}
         />
 
-        {/* Heartbeat ECG Line Animation */}
         <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 800 200" preserveAspectRatio="none">
           <motion.path
             d="M 0 100 L 250 100 L 270 60 L 290 140 L 310 100 L 450 100 L 470 40 L 490 160 L 510 100 L 650 100 L 670 60 L 690 140 L 710 100 L 800 100"
@@ -232,21 +223,20 @@ const Profile = () => {
           />
         </svg>
 
-        {/* Floating blood drops */}
         {BANNER_PARTICLES.map((p) => (
           <motion.div
             key={p.id}
             className="absolute rounded-full bg-gradient-to-br from-red-500 to-rose-600"
             style={{
               left: `${p.x}%`,
-              top: "100%", // Start at the bottom border of the banner
+              top: "100%",
               width: p.size,
               height: p.size,
               boxShadow: "0 0 8px rgba(239,68,68,0.4)",
             }}
             animate={{
-              y: [0, -200], // Float up by 200px (higher than banner's 176px height)
-              opacity: [0, 0.8, 0.8, 0], // Fade in, remain visible, fade out at top
+              y: [0, -200],
+              opacity: [0, 0.8, 0.8, 0],
             }}
             transition={{
               duration: p.duration,
@@ -265,7 +255,6 @@ const Profile = () => {
             <h1 className="text-2xl font-black tracking-tight mt-1">{user?.name}</h1>
           </div>
           
-          {/* Action buttons */}
           {!isEditing ? (
             <Button
               onClick={() => setIsEditing(true)}
@@ -308,12 +297,10 @@ const Profile = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        {/* ─── Left Column: Avatar & Summary ────────────────────────────────── */}
         <div className="space-y-6 md:col-span-1">
           <Card className="shadow-md border border-slate-100 bg-white overflow-hidden">
             <CardContent className="pt-8 pb-6 flex flex-col items-center text-center space-y-5">
               
-              {/* Profile Avatar Overlay */}
               <div className="relative group">
                 <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-50 border-4 border-slate-100 ring-4 ring-red-500/20 shadow-lg flex items-center justify-center transition-all duration-300 group-hover:ring-red-500/40">
                   {avatarPreview ? (
@@ -350,21 +337,17 @@ const Profile = () => {
                 )}
               </div>
 
-              {/* User Bio Details */}
               <div className="space-y-2">
                 <h3 className="text-xl font-bold text-slate-800 tracking-tight">{user?.name}</h3>
                 
-                {/* Dynamically styled badge for roles */}
                 <div className={`mx-auto inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}>
                   {badge.icon}
                   {badge.label}
                 </div>
               </div>
 
-              {/* Decorative Divider */}
               <div className="w-full border-t border-slate-100" />
 
-              {/* Blood Group Display with Glow */}
               <div className="space-y-2">
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Registered Blood Group</span>
                 <div className="relative w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br from-rose-50 to-red-50/30 border border-red-100/70 flex flex-col items-center justify-center shadow-sm overflow-hidden group hover:scale-105 transition-all duration-300">
@@ -377,7 +360,6 @@ const Profile = () => {
             </CardContent>
           </Card>
 
-          {/* Motivational Mini Card */}
           <Card className="shadow-md border border-slate-100 bg-gradient-to-br from-red-600 to-rose-700 text-white overflow-hidden relative">
             <div className="absolute right-0 bottom-0 opacity-15 transform translate-y-4 translate-x-4 pointer-events-none">
               <Activity className="w-24 h-24 stroke-[1.5px]" />
@@ -394,7 +376,6 @@ const Profile = () => {
           </Card>
         </div>
 
-        {/* ─── Right Column: Profile Fields Form ────────────────────────────── */}
         <Card className="shadow-md border border-slate-100 bg-white md:col-span-2 overflow-hidden flex flex-col justify-between">
           <div>
             <CardHeader className="border-b border-slate-50 pb-4">
@@ -403,10 +384,8 @@ const Profile = () => {
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
               
-              {/* Form Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 
-                {/* Email (Never editable) */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1.5 text-slate-600 font-semibold text-xs uppercase tracking-wider">
                     <Mail className="w-3.5 h-3.5 text-slate-400" />
@@ -420,7 +399,6 @@ const Profile = () => {
                   />
                 </div>
 
-                {/* Name */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1.5 text-slate-600 font-semibold text-xs uppercase tracking-wider">
                     <User className="w-3.5 h-3.5 text-slate-400" />
@@ -440,7 +418,6 @@ const Profile = () => {
                   />
                 </div>
 
-                {/* Blood Group Selector */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1.5 text-slate-600 font-semibold text-xs uppercase tracking-wider">
                     <Droplet className="w-3.5 h-3.5 text-slate-400" />
@@ -451,7 +428,7 @@ const Profile = () => {
                       type="text"
                       value={formData.bloodGroup}
                       disabled
-                      className="bg-slate-50 border-slate-200 text-slate-650 font-bold cursor-not-allowed h-11"
+                      className="bg-slate-50 border-slate-200 text-slate-655 font-bold cursor-not-allowed h-11"
                     />
                   ) : (
                     <Select
@@ -472,7 +449,6 @@ const Profile = () => {
                   )}
                 </div>
 
-                {/* District */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-1.5 text-slate-600 font-semibold text-xs uppercase tracking-wider">
                     <MapPin className="w-3.5 h-3.5 text-slate-400" />
@@ -504,7 +480,6 @@ const Profile = () => {
                   )}
                 </div>
 
-                {/* Upazila */}
                 <div className="space-y-2 sm:col-span-2">
                   <Label className="flex items-center gap-1.5 text-slate-600 font-semibold text-xs uppercase tracking-wider">
                     <MapPin className="w-3.5 h-3.5 text-slate-400" />
