@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
 const AuthContext = createContext(null);
@@ -6,12 +6,57 @@ const AuthContext = createContext(null);
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export const AuthProvider = ({ children }) => {
-  // Better Auth manages session state — useSession() is a reactive hook
-  const { data: session, isPending: loading, refetch } = authClient.useSession();
+  const { data: session, isPending: sessionLoading, refetch } = authClient.useSession();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const user = session?.user ?? null;
+  // ─── Sync session state and JWT token fallback (cross-domain cookie safe) ───
+  useEffect(() => {
+    const syncAuth = async () => {
+      const token = localStorage.getItem("access-token");
 
-  // ─── Sync access token with session state (Reload Safe) ─────────────────────
+      if (session?.user) {
+        // Standard session cookie auth
+        setUser(session.user);
+        setLoading(false);
+      } else if (token) {
+        // Cross-domain cookie is blocked, but we have a valid JWT!
+        try {
+          const res = await fetch(`${API_URL}/api/profile`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          if (res.ok) {
+            const profile = await res.json();
+            setUser({
+              id: profile._id || profile.id,
+              ...profile
+            });
+          } else {
+            // Token expired or invalid
+            localStorage.removeItem("access-token");
+            setUser(null);
+          }
+        } catch (err) {
+          console.error("JWT profile sync failed:", err);
+          setUser(null);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        // No session and no token
+        if (!sessionLoading) {
+          setUser(null);
+          setLoading(false);
+        }
+      }
+    };
+
+    syncAuth();
+  }, [session, sessionLoading]);
+
+  // Keep access token synced if Better Auth session cookie works
   useEffect(() => {
     if (session?.user) {
       const fetchToken = async () => {
@@ -32,10 +77,11 @@ export const AuthProvider = ({ children }) => {
         }
       };
       fetchToken();
-    } else if (!loading) {
+    } else if (!sessionLoading && !localStorage.getItem("access-token")) {
       localStorage.removeItem("access-token");
     }
-  }, [session, loading]);
+  }, [session, sessionLoading]);
+
 
   // ─── Register ──────────────────────────────────────────────────────────────
   // Better Auth signUp.email() handles hashing & session creation
@@ -55,7 +101,10 @@ export const AuthProvider = ({ children }) => {
 
     if (error) throw new Error(error.message || "Registration failed");
 
+    setLoading(true);
+
     // Fetch the JWT token immediately on successful registration to prevent race conditions
+    let token = "";
     try {
       const res = await fetch(`${API_URL}/api/jwt`, {
         method: "POST",
@@ -65,11 +114,36 @@ export const AuthProvider = ({ children }) => {
       if (res.ok) {
         const jwtData = await res.json();
         if (jwtData.token) {
-          localStorage.setItem("access-token", jwtData.token);
+          token = jwtData.token;
+          localStorage.setItem("access-token", token);
         }
       }
     } catch (err) {
       console.error("JWT fetch failed on registration:", err);
+    }
+
+    // Fetch and populate user profile details immediately using JWT
+    if (token) {
+      try {
+        const res = await fetch(`${API_URL}/api/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const profile = await res.json();
+          setUser({
+            id: profile._id || profile.id,
+            ...profile
+          });
+        }
+      } catch (err) {
+        console.error("Profile fetch failed on registration:", err);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
     }
 
     return data;
@@ -90,7 +164,10 @@ export const AuthProvider = ({ children }) => {
       throw new Error(error.message || "Login failed");
     }
 
+    setLoading(true);
+
     // Fetch the JWT token immediately on successful login to prevent race conditions
+    let token = "";
     try {
       const res = await fetch(`${API_URL}/api/jwt`, {
         method: "POST",
@@ -100,34 +177,44 @@ export const AuthProvider = ({ children }) => {
       if (res.ok) {
         const jwtData = await res.json();
         if (jwtData.token) {
-          localStorage.setItem("access-token", jwtData.token);
+          token = jwtData.token;
+          localStorage.setItem("access-token", token);
         }
       }
     } catch (err) {
       console.error("JWT fetch failed on login:", err);
     }
 
-    // Check if user is blocked (fetch from our DB)
-    try {
-      const token = localStorage.getItem("access-token");
-      const res = await fetch(`${API_URL}/api/profile`, {
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${token}`
+    // Fetch and populate user profile immediately using JWT
+    if (token) {
+      try {
+        const res = await fetch(`${API_URL}/api/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const profile = await res.json();
+          if (profile.status === "blocked") {
+            // Sign out immediately if blocked
+            await authClient.signOut();
+            localStorage.removeItem("access-token");
+            setUser(null);
+            throw new Error("Your account has been blocked. Contact support.");
+          }
+          setUser({
+            id: profile._id || profile.id,
+            ...profile
+          });
         }
-      });
-      if (res.ok) {
-        const profile = await res.json();
-        if (profile.status === "blocked") {
-          // Sign out immediately and throw
-          await authClient.signOut();
-          localStorage.removeItem("access-token");
-          throw new Error("Your account has been blocked. Contact support.");
-        }
+      } catch (err) {
+        if (err.message?.includes("blocked")) throw err;
+        console.error("Profile fetch failed on login:", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      if (err.message?.includes("blocked")) throw err;
-      // Other fetch errors — ignore, session is still valid
+    } else {
+      setLoading(false);
     }
 
     return data;
@@ -137,14 +224,31 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     await authClient.signOut();
     localStorage.removeItem("access-token");
+    setUser(null);
   };
-
 
   // ─── Update local user state (after profile update) ────────────────────────
   const updateUser = async () => {
-    // Re-fetch session from server to get updated user data
     await refetch();
+    const token = localStorage.getItem("access-token");
+    if (token) {
+      try {
+        const res = await fetch(`${API_URL}/api/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const profile = await res.json();
+          setUser({
+            id: profile._id || profile.id,
+            ...profile
+          });
+        }
+      } catch (err) {
+        console.error("Failed to update user profile:", err);
+      }
+    }
   };
+
 
   const value = {
     user,
