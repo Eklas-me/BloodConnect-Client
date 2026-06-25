@@ -6,13 +6,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { Edit3, Save, User, Mail, Droplet, MapPin, Upload, Loader2, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { 
+  Edit3, 
+  Save, 
+  User, 
+  Mail, 
+  Droplet, 
+  MapPin, 
+  Upload, 
+  Loader2, 
+  X, 
+  Shield, 
+  Award, 
+  Heart, 
+  Camera,
+  CheckCircle,
+  Activity
+} from "lucide-react";
 import axios from "axios";
 
 const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
+
+const BANNER_PARTICLES = Array.from({ length: 15 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  size: Math.random() * 8 + 5, // 5px to 13px
+  duration: Math.random() * 8 + 6, // 6s to 14s
+  delay: Math.random() * 4,
+}));
 
 const Profile = () => {
   const { user, updateUser } = useAuth();
@@ -129,228 +154,394 @@ const Profile = () => {
     }
   };
 
+  const getInitials = (name) =>
+    name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "U";
+
+  // Role style selection
+  const getRoleBadge = (role) => {
+    switch (role?.toLowerCase()) {
+      case "admin":
+        return {
+          bg: "bg-red-500/10 border-red-500/30 text-red-500",
+          icon: <Shield className="w-3.5 h-3.5" />,
+          label: "Administrator",
+        };
+      case "donor":
+        return {
+          bg: "bg-emerald-500/10 border-emerald-500/30 text-emerald-500",
+          icon: <Heart className="w-3.5 h-3.5 fill-current" />,
+          label: "Donor Helper",
+        };
+      default:
+        return {
+          bg: "bg-blue-500/10 border-blue-500/30 text-blue-500",
+          icon: <Award className="w-3.5 h-3.5" />,
+          label: "Volunteer Coordinator",
+        };
+    }
+  };
+
+  const badge = getRoleBadge(user?.role);
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">My Profile</h1>
-          <p className="text-sm text-slate-500">Manage your account information and location settings.</p>
-        </div>
-        {!isEditing ? (
-          <Button
-            onClick={() => setIsEditing(true)}
-            className="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 flex items-center gap-1.5"
-          >
-            <Edit3 className="w-4 h-4" />
-            Edit Profile
-          </Button>
-        ) : (
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handleCancel}
-              className="border-slate-350 hover:bg-slate-100 flex items-center gap-1.5"
-            >
-              <X className="w-4 h-4" />
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={saving}
-              className="bg-red-600 hover:bg-red-700 text-white font-semibold flex items-center gap-1.5"
-            >
-              {saving ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  Save Changes
-                </>
-              )}
-            </Button>
+    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-300">
+      
+      {/* ─── Profile Header Banner ────────────────────────────────────────── */}
+      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-slate-950 via-slate-900 to-red-950 h-44 shadow-lg border border-slate-800">
+        
+        {/* Glow orbs */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_120%,rgba(239,68,68,0.15),transparent_60%)] pointer-events-none" />
+        
+        <motion.div
+          className="absolute rounded-full bg-red-600/10 filter blur-[40px] pointer-events-none"
+          style={{ width: 200, height: 200, top: "20%", left: "50%", transform: "translate(-50%, -50%)" }}
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.5, 0.2],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Heartbeat ECG Line Animation */}
+        <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 800 200" preserveAspectRatio="none">
+          <motion.path
+            d="M 0 100 L 250 100 L 270 60 L 290 140 L 310 100 L 450 100 L 470 40 L 490 160 L 510 100 L 650 100 L 670 60 L 690 140 L 710 100 L 800 100"
+            fill="none"
+            stroke="#ef4444"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            initial={{ pathLength: 0, opacity: 0.15 }}
+            animate={{ 
+              pathLength: [0, 1],
+              opacity: [0.15, 0.4, 0.15]
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        </svg>
+
+        {/* Floating blood drops */}
+        {BANNER_PARTICLES.map((p) => (
+          <motion.div
+            key={p.id}
+            className="absolute rounded-full bg-gradient-to-br from-red-500 to-rose-600"
+            style={{
+              left: `${p.x}%`,
+              top: "100%", // Start at the bottom border of the banner
+              width: p.size,
+              height: p.size,
+              boxShadow: "0 0 8px rgba(239,68,68,0.4)",
+            }}
+            animate={{
+              y: [0, -200], // Float up by 200px (higher than banner's 176px height)
+              opacity: [0, 0.8, 0.8, 0], // Fade in, remain visible, fade out at top
+            }}
+            transition={{
+              duration: p.duration,
+              delay: p.delay,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        ))}
+
+        <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between z-10">
+          <div className="text-white space-y-1">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest bg-red-600/30 backdrop-blur-md px-3 py-1 rounded-full border border-red-500/20">
+              Community Lifesaver
+            </span>
+            <h1 className="text-2xl font-black tracking-tight mt-1">{user?.name}</h1>
           </div>
-        )}
+          
+          {/* Action buttons */}
+          {!isEditing ? (
+            <Button
+              onClick={() => setIsEditing(true)}
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold py-2.5 px-4 flex items-center gap-2 border border-white/20 hover:scale-102 active:scale-98 transition-all duration-300"
+            >
+              <Edit3 className="w-4 h-4" />
+              Edit Profile
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={handleCancel}
+                className="border-white/20 text-white bg-white/5 hover:bg-white/10 backdrop-blur-sm flex items-center gap-1.5"
+              >
+                <X className="w-4 h-4" />
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSave}
+                disabled={saving}
+                className="bg-red-650 hover:bg-red-700 text-white font-bold flex items-center gap-1.5 shadow-md shadow-red-900/40"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Save Details
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Left Column: Avatar & Summary */}
-        <Card className="shadow-sm border border-slate-150 bg-white md:col-span-1">
-          <CardContent className="pt-6 flex flex-col items-center text-center space-y-4">
-            <div className="relative w-32 h-32 rounded-full overflow-hidden bg-slate-100 border-2 border-red-500/20 shadow-inner flex items-center justify-center">
-              {avatarPreview ? (
-                <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
-              ) : formData.avatar ? (
-                <img src={formData.avatar} alt={user?.name} className="w-full h-full object-cover" />
-              ) : (
-                <User className="w-16 h-16 text-slate-300" />
-              )}
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        {/* ─── Left Column: Avatar & Summary ────────────────────────────────── */}
+        <div className="space-y-6 md:col-span-1">
+          <Card className="shadow-md border border-slate-100 bg-white overflow-hidden">
+            <CardContent className="pt-8 pb-6 flex flex-col items-center text-center space-y-5">
+              
+              {/* Profile Avatar Overlay */}
+              <div className="relative group">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-50 border-4 border-slate-100 ring-4 ring-red-500/20 shadow-lg flex items-center justify-center transition-all duration-300 group-hover:ring-red-500/40">
+                  {avatarPreview ? (
+                    <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : formData.avatar ? (
+                    <img src={formData.avatar} alt={user?.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <Avatar className="w-full h-full">
+                      <AvatarImage src="" />
+                      <AvatarFallback className="bg-gradient-to-br from-red-600 to-rose-700 text-white text-3xl font-bold">
+                        {getInitials(user?.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                </div>
 
-            {isEditing && (
-              <div className="space-y-1">
-                <Label htmlFor="profileAvatar" className="cursor-pointer text-xs font-semibold text-red-600 hover:underline flex items-center justify-center gap-1">
-                  <Upload className="w-3.5 h-3.5" />
-                  Upload Photo
-                </Label>
-                <input
-                  type="file"
-                  id="profileAvatar"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
+                {isEditing && (
+                  <>
+                    <Label
+                      htmlFor="profileAvatar"
+                      className="absolute inset-0 w-32 h-32 rounded-full bg-black/60 flex flex-col items-center justify-center gap-1 text-white text-xs font-bold cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    >
+                      <Camera className="w-5 h-5" />
+                      Change Photo
+                    </Label>
+                    <input
+                      type="file"
+                      id="profileAvatar"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </>
+                )}
               </div>
-            )}
 
-            <div>
-              <h3 className="text-lg font-bold text-slate-800 leading-tight">{user?.name}</h3>
-              <p className="text-xs text-slate-400 capitalize mt-1">Role: <span className="font-semibold">{user?.role}</span></p>
-            </div>
+              {/* User Bio Details */}
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold text-slate-800 tracking-tight">{user?.name}</h3>
+                
+                {/* Dynamically styled badge for roles */}
+                <div className={`mx-auto inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bg}`}>
+                  {badge.icon}
+                  {badge.label}
+                </div>
+              </div>
 
-            <div className="w-16 h-16 rounded-full bg-red-50 border border-red-100 text-red-600 font-extrabold flex flex-col items-center justify-center shadow-inner">
-              <span className="text-[9px] uppercase font-bold text-slate-400 leading-none">Group</span>
-              <span className="text-lg leading-tight">{user?.bloodGroup}</span>
-            </div>
-          </CardContent>
-        </Card>
+              {/* Decorative Divider */}
+              <div className="w-full border-t border-slate-100" />
 
-        {/* Right Column: Profile Form */}
-        <Card className="shadow-sm border border-slate-150 bg-white md:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold text-slate-800">Account Details</CardTitle>
-            <CardDescription>Personal registration values and geocode address records.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Email (Never editable) */}
-            <div className="space-y-1.5">
-              <Label className="flex items-center gap-1.5 text-slate-500 font-medium">
-                <Mail className="w-4 h-4 text-slate-400" />
-                Email Address
-              </Label>
-              <Input
-                type="email"
-                value={user?.email || ""}
-                disabled
-                className="bg-slate-50 border-slate-200 cursor-not-allowed text-slate-500"
-              />
-            </div>
+              {/* Blood Group Display with Glow */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Registered Blood Group</span>
+                <div className="relative w-20 h-20 mx-auto rounded-2xl bg-gradient-to-tr from-rose-50 to-red-50/50 border border-red-100 flex flex-col items-center justify-center shadow-inner hover:scale-105 transition-transform duration-300">
+                  <Droplet className="absolute w-12 h-12 text-red-500/10 -bottom-1" />
+                  <span className="text-2xl font-black text-red-600 z-10 leading-none">{user?.bloodGroup}</span>
+                </div>
+              </div>
 
-            {/* Name */}
-            <div className="space-y-1.5">
-              <Label className="flex items-center gap-1.5 text-slate-500 font-medium">
-                <User className="w-4 h-4 text-slate-400" />
-                Full Name
-              </Label>
-              <Input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleTextChange}
-                disabled={!isEditing}
-                className={!isEditing ? "bg-slate-50 border-slate-150 text-slate-700 cursor-not-allowed" : "bg-white"}
-              />
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Blood Group */}
-            <div className="space-y-1.5">
-              <Label className="flex items-center gap-1.5 text-slate-500 font-medium">
-                <Droplet className="w-4 h-4 text-slate-400" />
-                Blood Group
-              </Label>
-              {!isEditing ? (
-                <Input
-                  type="text"
-                  value={formData.bloodGroup}
-                  disabled
-                  className="bg-slate-50 border-slate-150 text-slate-700 cursor-not-allowed font-semibold"
-                />
-              ) : (
-                <Select
-                  value={formData.bloodGroup}
-                  onValueChange={(val) => handleSelectChange("bloodGroup", val)}
-                >
-                  <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Select Blood Group" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
-                      <SelectItem key={bg} value={bg}>
-                        {bg}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
+          {/* Motivational Mini Card */}
+          <Card className="shadow-md border border-slate-100 bg-gradient-to-br from-red-600 to-rose-700 text-white overflow-hidden relative">
+            <div className="absolute right-0 bottom-0 opacity-15 transform translate-y-4 translate-x-4 pointer-events-none">
+              <Activity className="w-24 h-24 stroke-[1.5px]" />
             </div>
+            <CardContent className="p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-white/90" />
+                <h4 className="font-bold text-sm">Lifesaver Status Active</h4>
+              </div>
+              <p className="text-xs text-red-50 leading-relaxed font-medium">
+                Thank you for being part of our network. Your willingness to donate blood can save lives in critical emergencies. Keep your profile updated so requestors can reach you.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
-            {/* District */}
-            <div className="space-y-1.5">
-              <Label className="flex items-center gap-1.5 text-slate-500 font-medium">
-                <MapPin className="w-4 h-4 text-slate-400" />
-                District
-              </Label>
-              {!isEditing ? (
-                <Input
-                  type="text"
-                  value={formData.district}
-                  disabled
-                  className="bg-slate-50 border-slate-150 text-slate-700 cursor-not-allowed"
-                />
-              ) : (
-                <Select
-                  value={formData.district}
-                  onValueChange={(val) => handleSelectChange("district", val)}
-                >
-                  <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Select District" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {districts.map((d) => (
-                      <SelectItem key={d.id} value={d.name}>
-                        {d.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
+        {/* ─── Right Column: Profile Fields Form ────────────────────────────── */}
+        <Card className="shadow-md border border-slate-100 bg-white md:col-span-2 overflow-hidden flex flex-col justify-between">
+          <div>
+            <CardHeader className="border-b border-slate-50 pb-4">
+              <CardTitle className="text-xl font-bold text-slate-800">Account Details</CardTitle>
+              <CardDescription>Verify your identity and set your primary donation locations.</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-6">
+              
+              {/* Form Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                
+                {/* Email (Never editable) */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-1.5 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                    <Mail className="w-3.5 h-3.5 text-slate-400" />
+                    Email Address
+                  </Label>
+                  <Input
+                    type="email"
+                    value={user?.email || ""}
+                    disabled
+                    className="bg-slate-50 border-slate-200 text-slate-500 font-medium cursor-not-allowed h-11"
+                  />
+                </div>
 
-            {/* Upazila */}
-            <div className="space-y-1.5">
-              <Label className="flex items-center gap-1.5 text-slate-500 font-medium">
-                <MapPin className="w-4 h-4 text-slate-400" />
-                Upazila
-              </Label>
-              {!isEditing ? (
-                <Input
-                  type="text"
-                  value={formData.upazila}
-                  disabled
-                  className="bg-slate-50 border-slate-150 text-slate-700 cursor-not-allowed"
-                />
-              ) : (
-                <Select
-                  value={formData.upazila}
-                  onValueChange={(val) => handleSelectChange("upazila", val)}
-                  disabled={!formData.district}
-                >
-                  <SelectTrigger className="bg-white">
-                    <SelectValue placeholder={formData.district ? "Select Upazila" : "Select District First"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredUpazilas.map((u) => (
-                      <SelectItem key={u.id} value={u.name}>
-                        {u.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-          </CardContent>
+                {/* Name */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-1.5 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                    <User className="w-3.5 h-3.5 text-slate-400" />
+                    Full Name
+                  </Label>
+                  <Input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleTextChange}
+                    disabled={!isEditing}
+                    className={`h-11 font-medium transition-all ${
+                      !isEditing 
+                        ? "bg-slate-50 border-slate-200 text-slate-600 cursor-not-allowed" 
+                        : "bg-white border-slate-300 focus:border-red-500 focus:ring-red-500/20"
+                    }`}
+                  />
+                </div>
+
+                {/* Blood Group Selector */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-1.5 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                    <Droplet className="w-3.5 h-3.5 text-slate-400" />
+                    Blood Group
+                  </Label>
+                  {!isEditing ? (
+                    <Input
+                      type="text"
+                      value={formData.bloodGroup}
+                      disabled
+                      className="bg-slate-50 border-slate-200 text-slate-650 font-bold cursor-not-allowed h-11"
+                    />
+                  ) : (
+                    <Select
+                      value={formData.bloodGroup}
+                      onValueChange={(val) => handleSelectChange("bloodGroup", val)}
+                    >
+                      <SelectTrigger className="bg-white border-slate-300 h-11">
+                        <SelectValue placeholder="Select Blood Group" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
+                          <SelectItem key={bg} value={bg}>
+                            {bg}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+
+                {/* District */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-1.5 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                    District
+                  </Label>
+                  {!isEditing ? (
+                    <Input
+                      type="text"
+                      value={formData.district}
+                      disabled
+                      className="bg-slate-50 border-slate-200 text-slate-600 font-medium cursor-not-allowed h-11"
+                    />
+                  ) : (
+                    <Select
+                      value={formData.district}
+                      onValueChange={(val) => handleSelectChange("district", val)}
+                    >
+                      <SelectTrigger className="bg-white border-slate-300 h-11">
+                        <SelectValue placeholder="Select District" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {districts.map((d) => (
+                          <SelectItem key={d.id} value={d.name}>
+                            {d.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+
+                {/* Upazila */}
+                <div className="space-y-2 sm:col-span-2">
+                  <Label className="flex items-center gap-1.5 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                    Upazila
+                  </Label>
+                  {!isEditing ? (
+                    <Input
+                      type="text"
+                      value={formData.upazila}
+                      disabled
+                      className="bg-slate-50 border-slate-200 text-slate-600 font-medium cursor-not-allowed h-11"
+                    />
+                  ) : (
+                    <Select
+                      value={formData.upazila}
+                      onValueChange={(val) => handleSelectChange("upazila", val)}
+                      disabled={!formData.district}
+                    >
+                      <SelectTrigger className="bg-white border-slate-300 h-11">
+                        <SelectValue placeholder={formData.district ? "Select Upazila" : "Select District First"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filteredUpazilas.map((u) => (
+                          <SelectItem key={u.id} value={u.name}>
+                            {u.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </div>
+
+          <div className="bg-slate-50/50 p-4 border-t border-slate-100 text-center text-xs text-slate-400 font-medium">
+            Account created in cooperation with Bangladesh Red Crescent Society.
+          </div>
         </Card>
       </div>
     </div>
